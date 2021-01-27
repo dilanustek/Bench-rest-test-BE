@@ -10,6 +10,7 @@ const printDailyBalance = (date, balance) =>
 
 const getUrl = (page) => url + page + ".json";
 
+// Fetch all the transaction on a page
 async function fetchTransactions(page) {
   const response = await fetch(getUrl(page));
 
@@ -21,7 +22,7 @@ async function fetchTransactions(page) {
   const { transactions, totalCount } = await response.json();
 
   if (transactions.length < 1) {
-    throw new Error(" No transactions available.");
+    throw new Error("No transactions available.");
   }
 
   return { transactions, totalCount };
@@ -33,7 +34,7 @@ async function getNumberOfPages() {
   return Math.ceil(totalCount / transactions.length);
 }
 
-// Print running daily balance from least to most recent date
+// Log the running daily balance from least to most recent date
 async function _logDailyBalances() {
   let prevDate = "";
   let runningDailyBalance = 0;
@@ -65,6 +66,7 @@ async function _logDailyBalances() {
   }
 }
 
+// public function, will be called in index.js
 const logDailyBalances = async () =>
   _logDailyBalances().catch((error) =>
     console.log("Error: there is a problem with fetching", error)
