@@ -1,0 +1,20 @@
+{
+  "name": "bench-rest-test-be",
+  "version": "1.0.0",
+  "description": "bench-rest-test-be",
+  "main": "fetchBalanceByDay.js",
+  "scripts": {
+    "test": "jest --watch",
+    "start": "node ./index.js"
+  },
+  "author": "Dilan Ustek",
+  "license": "ISC",
+  "dependencies": {
+    "json-server": "^0.16.3",
+    "node-fetch": "^2.6.1"
+  },
+  "devDependencies": {
+    "jest": "^26.6.3",
+    "msw": "^0.26.0"
+  }
+}

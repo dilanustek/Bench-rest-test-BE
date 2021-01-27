@@ -5,7 +5,7 @@
 const fetch = require("node-fetch");
 let url = "https://resttest.bench.co/transactions/";
 
-const printDateBalance = (date, balance) =>
+const printDailyBalance = (date, balance) =>
   console.log(date + " -> " + balance);
 
 const getUrl = (page) => url + page + ".json";
@@ -19,27 +19,28 @@ async function fetchTransactions(page) {
   }
 
   const { transactions, totalCount } = await response.json();
+
+  if (transactions.length < 1) {
+    throw new Error(" No transactions available.");
+  }
+
   return { transactions, totalCount };
 }
 
 // Get the number of pages since data is served from most to least recent.
 async function getNumberOfPages() {
   let { transactions, totalCount } = await fetchTransactions(1);
-  return Math.floor(totalCount / transactions.length) + 1;
+  return Math.ceil(totalCount / transactions.length);
 }
 
 // Print running daily balance from least to most recent date
-async function printDailyBalance() {
+async function _logDailyBalances() {
   let prevDate = "";
   let runningDailyBalance = 0;
 
   // sequentially fetch each page
   for (let page = await getNumberOfPages(); page > 0; page--) {
     let { transactions } = await fetchTransactions(page);
-
-    if (transactions.length < 1) {
-      throw new Error(" No transactions available.");
-    }
 
     // this is the first date so set up prevDate
     if (prevDate === "") prevDate = transactions[transactions.length - 1].Date;
@@ -50,7 +51,7 @@ async function printDailyBalance() {
 
       // print when date changes
       if (currentDate !== prevDate) {
-        printDateBalance(prevDate, runningDailyBalance / 100);
+        printDailyBalance(prevDate, runningDailyBalance / 100);
         prevDate = currentDate;
       }
 
@@ -59,11 +60,14 @@ async function printDailyBalance() {
 
     // print the final ever transaction
     if (page === 1) {
-      printDateBalance(prevDate, runningDailyBalance / 100);
+      printDailyBalance(prevDate, runningDailyBalance / 100);
     }
   }
 }
 
-printDailyBalance().catch((error) =>
-  console.log("Error: there is a problem with fetching", error)
-);
+const logDailyBalances = async () =>
+  _logDailyBalances().catch((error) =>
+    console.log("Error: there is a problem with fetching", error)
+  );
+
+module.exports = { fetchTransactions, logDailyBalances };
